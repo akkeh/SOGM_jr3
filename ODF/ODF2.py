@@ -128,8 +128,11 @@ timefrms:
     for n in np.arange(N/H - 1) + 1:
         onsets[n*H] = np.sum(derv2[n] * (mX[n] - mX[n - 1]))
     
+    '''
+    # second pass?
     ODF = np.zeros(N)
- 
+    '''
+
     thmul = 1
     onsets = abs(normalise(onsets))
     for n in range(N/H):
@@ -144,26 +147,5 @@ timefrms:
                 thmul = 1
         
     return normalise(onsets)
-
-
-def computeODF(inputFile, window, M, N, H):
-    """
-    Inputs:
-            inputFile (string): input sound file (monophonic with sampling rate of 44100)
-            window (string): analysis window type (choice of rectangular, triangular, hanning, hamming, 
-                blackman, blackmanharris)
-            M (integer): analysis window size (odd integer value)
-            N (integer): fft size (power of two, bigger or equal than than M)
-            H (integer): hop size for the STFT computation
-    Output:
-            The function should return a numpy array with two columns, where the first column is the ODF 
-            computed on the low frequency band and the second column is the ODF computed on the high 
-            frequency band.
-            ODF[:,0]: ODF computed in band 0 < f < 3000 Hz 
-            ODF[:,1]: ODF computed in band 3000 < f < 10000 Hz
-    """
-    
-    ### your code here
-    
 
 
