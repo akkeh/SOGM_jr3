@@ -1,6 +1,6 @@
 CC = g++
 CFLAGS = -Wall
-OBJ = Analysis.o
+OBJ = Analysis.o main.o
 PROG = FFTAnalyzer
 DIR = exec
 
