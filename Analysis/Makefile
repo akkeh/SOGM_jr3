@@ -1,16 +1,16 @@
 CC = g++
 CFLAGS = -Wall
 OBJ = Analysis.o main.o
-PROG = FFTAnalyzer
 DIR = exec
+PROG = FFTAnalyzer
 
-all: $(PROG)
+all: $(DIR) $(PROG)
 
 DIR:
 		mkdir -p ${DIR}
 
 $(PROG): $(OBJ)
-	$(CC) -o $(DIR)/$@  $(CFLAGS) $(OBJ)
+	$(CC) -o $(DIR)/$@ $(CFLAGS) $(OBJ)
 
 .cpp.o:
 	$(CC) -c $< $(CFLAGS)
