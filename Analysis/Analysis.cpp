@@ -56,23 +56,17 @@ double** Analysis::STFT(double* data, unsigned long dataLength, int windowLength
     double* temp = new double[windowLength];
 
     for (int l = 0; l < length; l++) {
-
         spect[l] = new double[windowLength / 2];
 
         for (int i = 0; i < windowLength; i++) {
             temp[i] = data[(l * sampleInterval) + i];
         }
 
-        FFT(temp, windowLength / 2);
-        //Get power spectrum
-        for (int i = 0; i < windowLength-1 / 2; i+=2) {
-            spect[l][i] = sqrt(pow(temp[i],2)+pow(temp[i+1],2)) / (windowLength/2.0);   //Klopt dit Akke? sqrt(abs(re)+abs(im))
+        FFT(temp, windowLength / 2);  //Compute FFT for one window
+        for (int i = 0; i < windowLength-1 / 2; i+=2) { //Compute power spectrum of window
+            spect[l][i] = sqrt(pow(temp[i],2)+pow(temp[i+1],2)) / (windowLength/2.0);   //Klopt dit? sqrt(abs(re)+abs(im))
         }
-        // for (int i = 0; i < windowLength / 2; i++) {
-        //     spect[l][i] = abs(temp[i]);
-        // }
     }
-
     delete[] temp;
 
     return spect;
