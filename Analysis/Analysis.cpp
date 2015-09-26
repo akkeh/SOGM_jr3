@@ -64,13 +64,13 @@ float** Analysis::STFT(double* data, unsigned long dataLength, int windowLength,
         }
 
         FFT(temp, windowLength / 2);
-
-        // for (int i = 0; i < windowLength-1 / 2; i+=2) {
-        //     spect[l][i] = sqrt(pow(temp[i],2)+pow(temp[i+1],2));
-        // }
-        for (int i = 0; i < windowLength / 2; i++) {
-            spect[l][i] = abs(temp[i]);//sqrt(pow(temp[i],2)+pow(temp[i+1],2));
+        //Get power spectrum
+        for (int i = 0; i < windowLength-1 / 2; i+=2) {
+            spect[l][i] = sqrt(pow(temp[i],2)+pow(temp[i+1],2)) / (windowLength/2.0);   //Klopt dit Akke? sqrt(abs(re)+abs(im))
         }
+        // for (int i = 0; i < windowLength / 2; i++) {
+        //     spect[l][i] = abs(temp[i]);
+        // }
     }
 
     delete[] temp;
