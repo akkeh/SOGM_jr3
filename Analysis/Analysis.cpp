@@ -1,17 +1,10 @@
-//
-//  Analysis.cpp
-//
-//  Created by Stefan Hendriks on 15/09/15.
-//
-//
-
 #include "Analysis.h"
 
 void Analysis::FFT(double* data, unsigned long nn) {
     unsigned long n, mmax, m, j, istep, i;
     double wtemp, wr, wpr, wpi, wi, theta;
     double tempr, tempi;
-    
+
     // reverse-binary reindexing
     n = nn << 1;
     j = 1;
@@ -27,7 +20,7 @@ void Analysis::FFT(double* data, unsigned long nn) {
         }
         j += m;
     };
-    
+
     // Danielson-Lanczos
     mmax = 2;
     while (n > mmax) {
@@ -43,7 +36,7 @@ void Analysis::FFT(double* data, unsigned long nn) {
                 j= i + mmax;
                 tempr = wr * data[j-1] - wi * data[j];
                 tempi = wr * data[j] + wi * data[j-1];
-                
+
                 data[j-1] = data[i-1] - tempr;
                 data[j] = data[i] - tempi;
                 data[i-1] += tempr;
@@ -57,29 +50,31 @@ void Analysis::FFT(double* data, unsigned long nn) {
     }
 }
 
-
 float** Analysis::STFT(double* data, unsigned long dataLength, int windowLength, int sampleInterval, int length) {
     float** spect = 0;
     spect = new float*[length];
     double* temp = new double[windowLength];
-    
+
     for (int l = 0; l < length; l++) {
-        
+
         spect[l] = new float[windowLength / 2];
-        
+
         for (int i = 0; i < windowLength; i++) {
             temp[i] = data[(l * sampleInterval) + i];
         }
-        
+
         FFT(temp, windowLength / 2);
-        
+
+        // for (int i = 0; i < windowLength-1 / 2; i+=2) {
+        //     spect[l][i] = sqrt(pow(temp[i],2)+pow(temp[i+1],2));
+        // }
         for (int i = 0; i < windowLength / 2; i++) {
-            spect[l][i] = abs(float(temp[i] * 1));
+            spect[l][i] = abs(temp[i]);//sqrt(pow(temp[i],2)+pow(temp[i+1],2));
         }
     }
-    
+
     delete[] temp;
-    
+
     return spect;
 }
 
@@ -95,17 +90,17 @@ float** Analysis::STFT(double* data, unsigned long dataLength, int length) {
 
 float Analysis::normalize(double* data, unsigned long dataLength, double gain) {
     double max = 0;
-    
+
     for (int i = 0; i < dataLength; i++) {
         if (fabs(data[i]) > max) {
             max = fabs(data[i]);
         }
     }
-    
+
     for (int i = 0; i < dataLength; i++) {
         data[i] = data[i] * gain / max;
     }
-    
+
     return max;
 }
 
@@ -113,6 +108,12 @@ float Analysis::normalize(double* data, unsigned long dataLength, double gain) {
 float Analysis::normalize(double* data, unsigned long dataLength) {
     return normalize(data, dataLength, 1.0);
 }
+
+// peak** Analysis::findPeaks(float** data, int windowLength, int length, int numPeak, float threshold) {
+//   peak** peaks = new peak*[numPeak];
+//
+//
+// }
 
 /*
 void Analysis::draw(double* data, unsigned long nn, ofVec2f location, ofVec2f size, bool altMode) {
@@ -137,7 +138,7 @@ void Analysis::drawMap(float** map, int length, int dataLength, ofVec2f location
 
     for (int l = 0; l < length; l++) {
         for (int i = 0; i < dataLength; i++) {
-            
+
             ofSetColor(fmin(map[l][i] * 5, 255));
             ofRect(l * rect.x + location.x,
                    i * rect.y + location.y,
