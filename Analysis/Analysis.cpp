@@ -50,14 +50,14 @@ void Analysis::FFT(double* data, unsigned long nn) {
     }
 }
 
-float** Analysis::STFT(double* data, unsigned long dataLength, int windowLength, int sampleInterval, int length) {
-    float** spect = 0;
-    spect = new float*[length];
+double** Analysis::STFT(double* data, unsigned long dataLength, int windowLength, int sampleInterval, int length) {
+    double** spect = 0;
+    spect = new double*[length];
     double* temp = new double[windowLength];
 
     for (int l = 0; l < length; l++) {
 
-        spect[l] = new float[windowLength / 2];
+        spect[l] = new double[windowLength / 2];
 
         for (int i = 0; i < windowLength; i++) {
             temp[i] = data[(l * sampleInterval) + i];
@@ -78,12 +78,12 @@ float** Analysis::STFT(double* data, unsigned long dataLength, int windowLength,
     return spect;
 }
 
-float** Analysis::STFT(double* data, unsigned long dataLength, int windowLength, int length) {
+double** Analysis::STFT(double* data, unsigned long dataLength, int windowLength, int length) {
     return STFT(data, dataLength, windowLength, dataLength / length, length);
 }
 
 
-float** Analysis::STFT(double* data, unsigned long dataLength, int length) {
+double** Analysis::STFT(double* data, unsigned long dataLength, int length) {
     return STFT(data, dataLength, 256, dataLength / length, length);
 }
 
@@ -109,11 +109,11 @@ float Analysis::normalize(double* data, unsigned long dataLength) {
     return normalize(data, dataLength, 1.0);
 }
 
-// peak** Analysis::findPeaks(float** data, int windowLength, int length, int numPeak, float threshold) {
-//   peak** peaks = new peak*[numPeak];
-//
-//
-// }
+peak* Analysis::findPeaks(double* data, int windowLength, int length, int numPeak, float threshold) {
+  //peak** peaks = new peak*[numPeak];
+
+  return 0;
+}
 
 /*
 void Analysis::draw(double* data, unsigned long nn, ofVec2f location, ofVec2f size, bool altMode) {

@@ -18,13 +18,13 @@ public:
     void FFT(double* data, unsigned long nn);
 
     //Length is horizontal resolution, windowLength is vertical resolution
-    float** STFT(double* data, unsigned long dataLength, int windowLength, int sampleInterval, int length);
-    float** STFT(double* data, unsigned long dataLength, int windowLength, int length);
-    float** STFT(double* data, unsigned long dataLength, int length);
+    double** STFT(double* data, unsigned long dataLength, int windowLength, int sampleInterval, int length);
+    double** STFT(double* data, unsigned long dataLength, int windowLength, int length);
+    double** STFT(double* data, unsigned long dataLength, int length);
 
     float normalize(double* data, unsigned long dataLength, double gain);
     float normalize(double* data, unsigned long dataLength);
-    peak** findPeaks(float** data, int windowLength, int length, int numPeak, float threshold);
+    peak* findPeaks(double* data, int windowLength, int length, int numPeak, float threshold);
 
     // Draw functions
     /*
