@@ -5,7 +5,7 @@ from scipy.signal import get_window
 import matplotlib.pyplot as plt
 import math
 
-sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../software/models/'))
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../../../../audioDSP_course/assignments/sms-tools/software/models/'))
 import stft
 import utilFunctions as UF
 

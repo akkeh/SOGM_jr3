@@ -137,9 +137,8 @@ timefrms:
                 onsets[p][n*H] = val
                 for k in range(bins):
                     if derv2[n][k] > inhibTh:
-                        binmul[n][k] = 0
                         for m in range(inhibRel):
-                            binmul[n+m][k] = 1/inhibRel * m
+                            binmul[n+m][k] = m/inhibRel 
                             if n+m > N/H:
                                 break;
     
