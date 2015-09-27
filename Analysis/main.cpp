@@ -8,7 +8,7 @@ int main( ){
 
     //Test signal
     for (unsigned long i=0; i<length-1; i+=2) {
-      data[i] = 0.5*sin(2.0*M_PI*i/windowLength)+ 0.5*sin(2.0*M_PI*i/windowLength*10); //Real part is signal
+      data[i] = 0.54*sin(2.0*M_PI*i/windowLength)+ 0.47*sin(2.0*M_PI*i/windowLength*10); //Real part is signal
       data[i+1] = 0;  //Img part = 0
     }
 
@@ -17,8 +17,8 @@ int main( ){
     for (unsigned long i=0; i<windowLength/2.0; i++) {
       cout << powerSpectrum[0][i] << endl;
     }
-    
-    //peak* findPeaks = fft.findPeaks(powerSpectrum[0], windowLength/4, 1, 10, 0.6);
+
+    //peak* peaks = fft.findPeaks(powerSpectrum[0], windowLength, 10, 0.2);
 
     delete[] data;
     return 0;

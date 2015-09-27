@@ -3,12 +3,14 @@
 
 #include <math.h>
 #include <algorithm>
+#include <vector>
 #include <iostream>
 using std::cout; using std::endl;
+using std::vector;
 
 typedef struct {	//Peak structure
-	float freq;
-	float amp;
+	double freq;
+	double amp;
 } peak;
 
 class Analysis {
@@ -24,7 +26,7 @@ public:
 
     float normalize(double* data, unsigned long dataLength, double gain);
     float normalize(double* data, unsigned long dataLength);
-    peak* findPeaks(double* data, int windowLength, int length, int numPeak, float threshold);
+    peak* findPeaks(double* data, int windowLength, int numPeak, double threshold);
 
     // Draw functions
     /*

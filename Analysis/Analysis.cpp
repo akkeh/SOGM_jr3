@@ -103,9 +103,16 @@ float Analysis::normalize(double* data, unsigned long dataLength) {
     return normalize(data, dataLength, 1.0);
 }
 
-peak* Analysis::findPeaks(double* data, int windowLength, int length, int numPeak, float threshold) {
-  //peak** peaks = new peak*[numPeak];
+peak* Analysis::findPeaks(double* data, int windowLength, int numPeak, double threshold) {
+  vector<double> peaks; //Store peak or peak index?
 
+  for (unsigned long i=0; i<windowLength/2.0; i++) {  //Find peaks
+    if (data[i] > threshold) {
+      peaks.push_back(data[i]);
+    }
+  }
+  std::sort(peaks.begin(),peaks.end(),std::greater<double>());  //Sort peaks
+  
   return 0;
 }
 
