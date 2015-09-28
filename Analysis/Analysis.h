@@ -9,9 +9,11 @@ using std::cout; using std::endl;
 using std::vector;
 
 typedef struct {	//Peak structure
+	unsigned int index;
 	double freq;
 	double amp;
 } peak;
+
 
 class Analysis {
 public:
@@ -27,13 +29,13 @@ public:
     float normalize(double* data, unsigned long dataLength, double gain);
     float normalize(double* data, unsigned long dataLength);
     peak* findPeaks(double* data, int windowLength, int numPeak, double threshold);
-
-    // Draw functions
-    /*
-    void draw(double* data, unsigned long nn, ofVec2f location, ofVec2f size, bool altMode);
-    void drawMap(float** map, int length, int dataLength, ofVec2f location, ofVec2f size);
-    */
-
+		//bool operator< (const peak &a, const peak &b) { return a.amp < b.amp; }
 };
 
 #endif
+
+// Draw functions
+/*
+void draw(double* data, unsigned long nn, ofVec2f location, ofVec2f size, bool altMode);
+void drawMap(float** map, int length, int dataLength, ofVec2f location, ofVec2f size);
+*/

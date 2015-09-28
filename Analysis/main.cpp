@@ -14,11 +14,11 @@ int main( ){
 
     //Compute power spectrum
     double** powerSpectrum = fft.STFT(data,length,windowLength,1);
-    for (unsigned long i=0; i<windowLength/2.0; i++) {
-      cout << powerSpectrum[0][i] << endl;
-    }
+    // for (unsigned long i=0; i<windowLength/2.0; i++) {
+    //   cout << powerSpectrum[0][i] << endl;
+    // }
 
-    //peak* peaks = fft.findPeaks(powerSpectrum[0], windowLength, 10, 0.2);
+    peak* peaks = fft.findPeaks(powerSpectrum[0], windowLength, 10, 0.2);
 
     delete[] data;
     return 0;
