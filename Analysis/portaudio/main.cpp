@@ -10,7 +10,5 @@ int main() {
   //   audioIn.writeSamples();
   // }
 
-  audioIn.stopAudio();
-
   return 0;
 }

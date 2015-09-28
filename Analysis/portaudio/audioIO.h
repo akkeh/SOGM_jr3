@@ -6,7 +6,7 @@
 
 #define sampleRate 44100
 #define numChannels 1
-#define numFrames	1024
+#define numFrames	64
 
 class audioIO : public Audio_IO {
 

@@ -6,6 +6,7 @@ audioIO::audioIO() {
 }
 
 audioIO::~audioIO() {
+  stopAudio();
   delete[] buffer;
 }
 
