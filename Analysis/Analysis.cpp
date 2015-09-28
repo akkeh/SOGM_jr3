@@ -64,7 +64,7 @@ double** Analysis::STFT(double* data, unsigned long dataLength, int windowLength
 
         FFT(temp, windowLength / 2);  //Compute FFT for one window
         for (int i = 0; i < windowLength-1 / 2; i+=2) { //Compute power spectrum of window
-            spect[l][i] = sqrt(pow(temp[i],2)+pow(temp[i+1],2)) / (windowLength/2.0);   //Klopt dit? sqrt(abs(re)+abs(im))
+            spect[l][i] = sqrt(pow(temp[i],2)+pow(temp[i+1],2)) / (windowLength/2.0);   //Klopt dit? sqrt(abs(re)+abs(im)) (JA DIT KLOPT! sqrt(re^2 + im^2) )
         }
     }
     delete[] temp;
