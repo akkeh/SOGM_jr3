@@ -2,11 +2,11 @@ CC = g++
 CFLAGS = -Wall
 LDFLAGS= -L/usr/local/lib -lportaudio
 
-OBJ= audioIO.o portaudio_io.o main.o
+OBJ= audio_io.o main.o
 
-all: audioIO
+all: audioInput
 
-audioIO: $(OBJ)
+audioInput: $(OBJ)
 	$(CC) -o $@ $(CFLAGS) $(OBJ) $(LDFLAGS)
 
 .cpp.o:
