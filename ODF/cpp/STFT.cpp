@@ -1,14 +1,17 @@
-#include <cmath>
-#include <iostream>
-
-#define TWOPI (M_PI+M_PI)
-#define FOURPI (TWOPI+TWOPI)
+#include "STFT.h"
 
 /*
     -   static buffers?
     -   mem leaks
-
 */
+
+STFT::STFT() {
+    
+}
+
+STFT::STFT(unsigned long N, unsigned long M, unsigned long bins, unsigned long H) {
+
+}
 
 int STFT::FFT(double* data, unsigned long nn) {
     unsigned long n, mmax, m, j, istep, i;
@@ -84,6 +87,10 @@ double* STFT::zeropad(double* x, unsigned long N, unsigned long newN) {
     return y;
 };
 
+double** STFT::stft(double* x) {
+//    return dstft(x, N, M, bins, H) {
+}
+
 double** STFT::stft(double* x, unsigned long N, unsigned long M, unsigned long bins, unsigned long H) {
     // N multiple of M?
     unsigned long frames = N/H;    
@@ -98,7 +105,7 @@ double** STFT::stft(double* x, unsigned long N, unsigned long M, unsigned long b
         // copy input buffer:
         for(unsigned long n=0; n<M; n++) {
             x_part[2*n] = x[(2*H)*l + 2*n] * w[n];          // even
-            x_part[2*n + 1] = x[(2*H)*l + 2*n + 1] * w[n];  // oneven
+            x_part[2*n + 1] = x[(2*H)*l + 2*n + 1] * w[n];  // odd
         };
         X[l] = zeropad(x_part, M*2, bins*2);
         FFT(X[l], bins);
@@ -107,7 +114,7 @@ double** STFT::stft(double* x, unsigned long N, unsigned long M, unsigned long b
     return X;
 };
 
-double imabs(double re, double im) {
+double STFT::imabs(double re, double im) {
     return std::sqrt((re*re)+(im*im));
 };
 
