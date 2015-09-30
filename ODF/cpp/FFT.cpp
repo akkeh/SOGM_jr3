@@ -1,6 +1,5 @@
 #include <cmath>
 #include <iostream>
-#include "FFT.h"
 
 #define TWOPI (M_PI+M_PI)
 #define FOURPI (TWOPI+TWOPI)
@@ -11,7 +10,7 @@
 
 */
 
-int FFT(double* data, unsigned long nn) {
+int STFT::FFT(double* data, unsigned long nn) {
     unsigned long n, mmax, m, j, istep, i;
     double wtemp, wr, wpr, wpi, wi, theta;
     double tempr, tempi;
@@ -62,7 +61,7 @@ int FFT(double* data, unsigned long nn) {
     return 0;
 }
 
-double* getBlackman(unsigned long M) {
+double* STFT::getBlackman(unsigned long M) {
     double a0, a1, a2;
     a0 = 7938.0/18608.0;
     a1 = 9240.0/18608.0;
@@ -76,7 +75,7 @@ double* getBlackman(unsigned long M) {
     return w;
 };
 
-double* zeropad(double* x, unsigned long N, unsigned long newN) {
+double* STFT::zeropad(double* x, unsigned long N, unsigned long newN) {
     double* y = new double[newN];
     for (unsigned long n=0; n<N; ++n) 
         y[n] = x[n];
@@ -85,7 +84,7 @@ double* zeropad(double* x, unsigned long N, unsigned long newN) {
     return y;
 };
 
-double** STFT(double* x, unsigned long N, unsigned long M, unsigned long bins, unsigned long H) {
+double** STFT::stft(double* x, unsigned long N, unsigned long M, unsigned long bins, unsigned long H) {
     // N multiple of M?
     unsigned long frames = N/H;    
 
@@ -111,29 +110,4 @@ double** STFT(double* x, unsigned long N, unsigned long M, unsigned long bins, u
 double imabs(double re, double im) {
     return std::sqrt((re*re)+(im*im));
 };
-
-int main() {
-    unsigned long N = 1024;
-    double* x = new double[N*2];
-    for(unsigned long n=0; n<N; ++n) {
-        x[2*n] = std::sin(TWOPI * n * 2 / N);
-        x[2*n + 1] = 0;
-    };
-    unsigned long M = 512;
-    unsigned long H = 128;
-    unsigned long bins = 1024;
-    double** X = STFT(x, N, M, bins, H);
-
-    for (unsigned long m=0; m<N/H; ++m) {
-        //std::cout << "frame: " << m << std::endl;
-        for (unsigned long k=0; k<bins; ++k) {
-            std::cout << "\t" << imabs(X[m][2*k], X[m][2*k + 1]) << std::endl;
-        }
-    }
-
-    for (unsigned long m=0; m<N/H; ++m) {
-        delete[] X[m];
-    }
-};
-
 
