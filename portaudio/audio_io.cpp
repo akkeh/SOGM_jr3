@@ -29,7 +29,7 @@
 **********************************************************************/
 #include <iostream>
 #include <cstdlib>
-#include "portaudio_io.h"
+#include "audio_io.h"
 
 using namespace std;
 
