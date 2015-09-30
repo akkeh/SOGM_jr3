@@ -1,15 +1,88 @@
 #include <cmath>
 #include <iostream>
-#include "FFT.h"
+
+#include "ODF.h"
+
+// N
+#define BUFFERSIZE 1024
+// M
+#define WINDOWSIZE 512
+// bins
+#define FFTSIZE 1024
+// H
+#define HOPSIZE 128
 
 #define TWOPI (M_PI+M_PI)
 #define FOURPI (TWOPI+TWOPI)
-
 /*
     -   static buffers?
     -   mem leaks
 
 */
+
+double imabs(double re, double im) {
+    return std::sqrt((re*re)+(im*im));
+};
+
+double** stft_mag(double** X, unsigned long frames, unsigned long bins) {
+    double** mX = new double*[frames];
+    for(unsigned long l=0; l<frames; l++) {
+        mX[l] = new double[bins];
+        for(unsigned long k=0; k<bins; k++)
+            mX[l][k] = imabs(X[l][2*k], X[l][2*k + 1]);
+    };
+    return mX;
+};
+
+double imphs(double re, double im) {
+    return std::atan2(im, re);
+};
+
+double** transpose(double** x, unsigned long M, unsigned long N) {
+    double** y = new double*[N];
+    for(unsigned long n=0; n<N; ++n) {
+        y[n] = new double[M];
+        for(unsigned long m=0; m<M; ++m)
+            y[n][m] = x[m][n];
+    };
+    return y;
+};
+
+double* phase_unwrap(double* x, unsigned long N) {
+    double* y = new double[N];
+    unsigned long addPI = 0;
+
+    y[0] = x[0];
+    for(unsigned long n=1; n<N; n++) {
+        if((x[n] < 0) && (x[n - 1]))
+            addPI++;
+        y[n] = x[n] + (TWOPI * addPI);
+    };
+    return y;
+};
+
+double** nd_phase_unwrap(double** x, unsigned long M, unsigned long N) {
+    double** y = new double*[M];
+    for(unsigned long m=0; m<M; ++m)
+        y[m] = phase_unwrap(x[m], N);
+
+    return y;
+        
+};
+
+double** stft_phs(double** X, unsigned long frames, unsigned long bins) {
+    double** pX = new double*[frames];
+    for(unsigned long l=0; l<frames; l++) {
+        pX[l] = new double[bins];
+        for(unsigned long k=0; k<bins; k++)
+            pX[l][k] = imphs(X[l][2*k], X[l][2*k + 1]);
+    };
+    // transpose pX
+    return pX;
+};
+
+
+
 
 int FFT(double* data, unsigned long nn) {
     unsigned long n, mmax, m, j, istep, i;
@@ -88,7 +161,6 @@ double* zeropad(double* x, unsigned long N, unsigned long newN) {
 double** STFT(double* x, unsigned long N, unsigned long M, unsigned long bins, unsigned long H) {
     // N multiple of M?
     unsigned long frames = N/H;    
-
     double** X = new double*[frames];
     
     double* w = getBlackman(M);
@@ -108,9 +180,60 @@ double** STFT(double* x, unsigned long N, unsigned long M, unsigned long bins, u
     return X;
 };
 
-double imabs(double re, double im) {
-    return std::sqrt((re*re)+(im*im));
+double* derv(double* x, unsigned long N) {
+    double* y = new double[N];
+    y[0] = 0;
+    for(unsigned long n=1; n<N; ++n)
+        y[n] = x[n] + x[n - 1];
+    return y;
 };
+
+double** nd_derv(double** x, unsigned long M, unsigned long N) {
+    double** y = new double*[M];
+    for(unsigned long m=0; m<M; ++m)
+        y[m] = derv(x[m], N);
+    return y;
+};
+
+double* ODF::phaseFlux(double* x, unsigned long N, double th, double inhibTh, unsigned long inhibRel) {
+    double* onsets = new double[N];
+
+    // STFT* stft = new STFT(WINDOWSIZE, FFTSIZE, HOPSIZE);
+    // double** X = STFT->stft(x, N, WINDOWSIZE, FFTSIZE, HOPSIZE);
+    double** X = STFT(x, N, WINDOWSIZE, FFTSIZE, HOPSIZE);
+
+    unsigned long frames = N/HOPSIZE;
+    double** mX = stft_mag(X, frames, FFTSIZE);
+    double** pX = stft_phs(X, frames, FFTSIZE);
+
+    double** pXT = transpose(pX, frames, FFTSIZE);
+    double** pX_unwrap = nd_phase_unwrap(pXT, FFTSIZE, frames);
+    
+    double** derv = nd_derv(pX_unwrap, FFTSIZE, frames);
+    derv = nd_derv(derv, FFTSIZE, frames);
+    
+ 
+    for(unsigned long l=0; l<frames; ++l) {
+        double val = 0;
+        for(unsigned k=0; k<FFTSIZE; ++k) 
+            val += derv[k][l] * mX[l][k];
+        if(val/FFTSIZE > th) {
+            onsets[l * HOPSIZE] = val;
+            for(unsigned long k=0; k<FFTSIZE; ++k) {
+                if(derv[k][l] > inhibTh) 
+                    for(unsigned long n=0; n<inhibRel; ++n) {
+                        mX[l + n][k] *= n/inhibRel;
+                        if((l + n) <= frames)
+                            break;
+                    }
+            };
+        }
+    }
+    
+    
+    return onsets;
+};
+
 
 int main() {
     unsigned long N = 1024;
@@ -119,21 +242,10 @@ int main() {
         x[2*n] = std::sin(TWOPI * n * 2 / N);
         x[2*n + 1] = 0;
     };
-    unsigned long M = 512;
-    unsigned long H = 128;
-    unsigned long bins = 1024;
-    double** X = STFT(x, N, M, bins, H);
+    ODF odf;
+    double* onsets = odf.phaseFlux(x, N, 10, 0.01, 10);
 
-    for (unsigned long m=0; m<N/H; ++m) {
-        //std::cout << "frame: " << m << std::endl;
-        for (unsigned long k=0; k<bins; ++k) {
-            std::cout << "\t" << imabs(X[m][2*k], X[m][2*k + 1]) << std::endl;
-        }
-    }
-
-    for (unsigned long m=0; m<N/H; ++m) {
-        delete[] X[m];
-    }
+    for(unsigned long n=0; n<N; ++n)
+        std::cout << onsets[n] << std::endl;
 };
-
 

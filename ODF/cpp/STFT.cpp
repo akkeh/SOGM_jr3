@@ -1,4 +1,13 @@
+<<<<<<< HEAD
+#include <cmath>
+#include <iostream>
+
+
+#define TWOPI (M_PI+M_PI)
+#define FOURPI (TWOPI+TWOPI)
+=======
 #include "STFT.h"
+>>>>>>> 9ffaf57f3ef955efcaa7cf6f0d35756f6ce7ae87
 
 /*
     -   static buffers?
