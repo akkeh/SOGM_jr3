@@ -8,13 +8,13 @@
 #define FOURPI (TWOPI+TWOPI)
 
 //N
-#define BUFFERSIZE = 1024;
+#define BUFFERSIZE 1024
 //M
-#define WINDOWSIZE = 512;
+#define WINDOWSIZE 512
 //H
-#define HOPSIZE = 128;
+#define HOPSIZE 128
 //bins
-#define FFTSIZE = 1024;
+#define FFTSIZE 1024
 
 class STFT
 {
@@ -22,6 +22,7 @@ public:
     
     STFT();
     STFT(unsigned long N, unsigned long M, unsigned long bins, unsigned long H);
+    ~STFT();
 
     int FFT(double* data, unsigned long nn);
 
@@ -33,6 +34,9 @@ public:
     double imabs(double re, double im);
     
 private:
+    //window
+    double* w;
+    
     unsigned long N;
     unsigned long M;
     unsigned long bins;
