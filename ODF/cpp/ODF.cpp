@@ -29,7 +29,7 @@ double** stft_mag(double** X, unsigned long frames, unsigned long bins) {
     for(unsigned long l=0; l<frames; l++) {
         mX[l] = new double[bins];
         for(unsigned long k=0; k<bins; k++)
-            mX[l][k] = imabs(X[l][2*k], X[l][2*k + 1]) / bins;
+            mX[l][k] = imabs(X[l][2*k], X[l][2*k + 1]);
     };
     return mX;
 };
@@ -217,16 +217,15 @@ double* ODF::phaseFlux(double* x, unsigned long N, double th, double inhibTh, un
         double val = 0;
         for(unsigned k=0; k<FFTSIZE; ++k) 
             val += derv[k][l] * mX[l][k];
-        if(val > th) {
+        if(val/FFTSIZE > th) {
             onsets[l * HOPSIZE] = val;
             for(unsigned long k=0; k<FFTSIZE; ++k) {
-                if(derv[k][l] > inhibTh) {
+                if(derv[k][l] > inhibTh) 
                     for(unsigned long n=0; n<inhibRel; ++n) {
                         mX[l + n][k] *= n/inhibRel;
                         if((l + n) <= frames)
                             break;
                     }
-                }
             };
         }
     }
@@ -244,10 +243,9 @@ int main() {
         x[2*n + 1] = 0;
     };
     ODF odf;
-    double* onsets = odf.phaseFlux(x, N, 0.01, 0.01, 10);
+    double* onsets = odf.phaseFlux(x, N, 10, 0.01, 10);
 
     for(unsigned long n=0; n<N; ++n)
         std::cout << onsets[n] << std::endl;
 };
-
 
