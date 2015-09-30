@@ -6,11 +6,25 @@
 */
 
 STFT::STFT() {
+    N = BUFFERSIZE;
+    M = WINDOWSIZE;
+    bins = HOPSIZE;
+    H = FFTSIZE;
     
+    w = getBlackman(M);
 }
 
 STFT::STFT(unsigned long N, unsigned long M, unsigned long bins, unsigned long H) {
+    this->N = N;
+    this->M = M;
+    this->bins = bins;
+    this->H = H;
+    
+    w = getBlackman(M);
+}
 
+STFT::~STFT() {
+    delete[] w;
 }
 
 int STFT::FFT(double* data, unsigned long nn) {
@@ -76,7 +90,7 @@ double* STFT::getBlackman(unsigned long M) {
     };
 
     return w;
-};
+}
 
 double* STFT::zeropad(double* x, unsigned long N, unsigned long newN) {
     double* y = new double[newN];
@@ -85,10 +99,10 @@ double* STFT::zeropad(double* x, unsigned long N, unsigned long newN) {
     for(unsigned long n=N; n<newN; n++)
         y[n] = 0;
     return y;
-};
+}
 
 double** STFT::stft(double* x) {
-//    return dstft(x, N, M, bins, H) {
+    return stft(x, N, M, bins, H);
 }
 
 double** STFT::stft(double* x, unsigned long N, unsigned long M, unsigned long bins, unsigned long H) {
@@ -97,8 +111,6 @@ double** STFT::stft(double* x, unsigned long N, unsigned long M, unsigned long b
 
     double** X = new double*[frames];
     
-    double* w = getBlackman(M);
-
     double* x_part = new double[bins*2];
     
     for(unsigned long l=0; l<frames; l++) {
@@ -110,11 +122,13 @@ double** STFT::stft(double* x, unsigned long N, unsigned long M, unsigned long b
         X[l] = zeropad(x_part, M*2, bins*2);
         FFT(X[l], bins);
 
-    };
+    }
+    delete[] x_part;
+    
     return X;
-};
+}
 
 double STFT::imabs(double re, double im) {
     return std::sqrt((re*re)+(im*im));
-};
+}
 
