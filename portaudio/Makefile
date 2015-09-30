@@ -4,9 +4,9 @@ LDFLAGS= -L/usr/local/lib -lportaudio
 
 OBJ= audio_io.o main.o
 
-all: audioInput
+all: audioIn
 
-audioInput: $(OBJ)
+audioIn: $(OBJ)
 	$(CC) -o $@ $(CFLAGS) $(OBJ) $(LDFLAGS)
 
 .cpp.o:

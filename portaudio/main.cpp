@@ -4,23 +4,23 @@
 #define CHANNELS	1
 #define FRAMES	    1024
 
-void startAudio(Audio_IO* audioStream, int* input_device) {
+void startAudio(Audio_IO* audioStream) {
+    static int input_device;
     audioStream->set_mode(AUDIO_IO_READONLY);
     audioStream->set_framesperbuffer(FRAMES);
     audioStream->initialise();
     audioStream->list_devices();
     std::cout << "\nGive input device number: ";
-    std::cin >> *input_device;
-    audioStream->set_input_device(*input_device);
+    std::cin >> input_device;
+    audioStream->set_input_device(input_device);
     audioStream->start_server();
 }
 
 int main() {
     Audio_IO audioStream(SAMPLERATE,CHANNELS);
     float* buffer = new float[FRAMES*CHANNELS];
-    static int input_device;
 
-    startAudio(&audioStream, &input_device);
+    startAudio(&audioStream);
 
     while (true) {
         audioStream.read(buffer);
