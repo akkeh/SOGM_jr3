@@ -64,7 +64,11 @@ double** Analysis::STFT(double* data, unsigned long dataLength, int windowLength
 
         FFT(temp, windowLength / 2);  //Compute FFT for one window
         for (int i = 0; i < windowLength-1 / 2; i+=2) { //Compute power spectrum of window
+<<<<<<< HEAD:STFT/Analysis.cpp
             spect[l][i] = sqrt(pow(temp[i],2)+pow(temp[i+1],2)) / (windowLength/2.0);   //Klopt dit? sqrt(abs(re)+abs(im)) (JA DIT KLOPT! sqrt(re^2 + im^2) )
+=======
+            spect[l][i] = sqrt(pow(temp[i],2)+pow(temp[i+1],2)) / (windowLength/2.0);
+>>>>>>> dev:Analysis/Analysis.cpp
         }
     }
     delete[] temp;
@@ -103,8 +107,21 @@ float Analysis::normalize(double* data, unsigned long dataLength) {
     return normalize(data, dataLength, 1.0);
 }
 
-peak* Analysis::findPeaks(double* data, int windowLength, int length, int numPeak, float threshold) {
-  //peak** peaks = new peak*[numPeak];
+peak* Analysis::findPeaks(double* data, int windowLength, int numPeak, double threshold) {
+  vector<peak> peaks;
+  peak peak;
+
+  for (unsigned long i=0; i<windowLength/2.0; i++) {  //Find peaks
+    if (data[i] > threshold) {
+      peak.amp = data[i];
+      peak.index = i;
+      peaks.push_back(peak);
+    }
+  }
+  for (unsigned long i=0; i<peaks.size(); i++) {
+    cout << peaks[i].amp;
+  }
+  //std::sort(peaks.begin(),peaks.end());  //Sort peaks
 
   return 0;
 }
