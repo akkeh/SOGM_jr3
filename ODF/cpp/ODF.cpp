@@ -76,28 +76,16 @@ double* getBlackman(unsigned long M) {
 };
 
 double* zeropad(double* x, unsigned long N, unsigned long newN) {
-    std::cout << "newN: " << newN <<std::endl; 
     double* y = new double[newN];
-<<<<<<< HEAD
-    for (unsigned long n=0; n<N; ++n) {
-        y[n] = x[n];
-    }
-
-    for (unsigned long n=N; n<newN; ++n) {
-=======
-    std::cout << "\n2\n";
-    for(unsigned long n=0; n<N; n++)
+    for (unsigned long n=0; n<N; ++n) 
         y[n] = x[n];
     for(unsigned long n=N; n<newN; n++)
->>>>>>> master
         y[n] = 0;
-    }
     return y;
 };
 
 double** STFT(double* x, unsigned long N, unsigned long M, unsigned long bins, unsigned long H) {
     // N multiple of M?
-<<<<<<< HEAD
     unsigned long frames = N/H;    
 
     double** X = new double*[frames];
@@ -105,22 +93,7 @@ double** STFT(double* x, unsigned long N, unsigned long M, unsigned long bins, u
     double* w = getBlackman(M);
 
     double* x_part = new double[bins*2];
-=======
-    /*
-    float diff = (long double)N/(long double)M - (unsigned long)((long double)N/(long double)M);
-    unsigned long newN = (unsigned long)(N+(M*diff));
-    double* x_zp = zeropad(x, N, newN);    
-    */
-    unsigned long newN = N;
-    unsigned long frames = newN/H;
-    double** X = new double*[frames];
-    for(unsigned long l=0; l<frames; l++)
-        X[l] = new double[bins*2];      
-
-    double* w = getBlackman(M);
- 
-    double* x_part = new double[M*2];
->>>>>>> master
+    
     for(unsigned long l=0; l<frames; l++) {
         // copy input buffer:
         for(unsigned long n=0; n<M; n++) {
@@ -129,10 +102,7 @@ double** STFT(double* x, unsigned long N, unsigned long M, unsigned long bins, u
         };
         X[l] = zeropad(x_part, M*2, bins*2);
         FFT(X[l], bins);
-<<<<<<< HEAD
 
-=======
->>>>>>> master
     };
     return X;
 };
@@ -150,7 +120,7 @@ int main() {
     };
     unsigned long M = 512;
     unsigned long H = 128;
-    unsigned long bins = 512;
+    unsigned long bins = 1024;
     double** X = STFT(x, N, M, bins, H);
 
     for (unsigned long m=0; m<N/H; ++m) {
@@ -160,7 +130,7 @@ int main() {
         }
     }
 
-    for (unsigned long m=0; m<N/H - 1; ++m) {
+    for (unsigned long m=0; m<N/H; ++m) {
         delete[] X[m];
     }
 };
