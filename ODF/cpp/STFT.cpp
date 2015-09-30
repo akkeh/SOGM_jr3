@@ -1,13 +1,4 @@
-<<<<<<< HEAD
-#include <cmath>
-#include <iostream>
-
-
-#define TWOPI (M_PI+M_PI)
-#define FOURPI (TWOPI+TWOPI)
-=======
 #include "STFT.h"
->>>>>>> 9ffaf57f3ef955efcaa7cf6f0d35756f6ce7ae87
 
 /*
     -   static buffers?
@@ -19,7 +10,7 @@ STFT::STFT() {
     M = WINDOWSIZE;
     bins = HOPSIZE;
     H = FFTSIZE;
-    
+
     w = getBlackman(M);
 }
 
@@ -28,7 +19,7 @@ STFT::STFT(unsigned long N, unsigned long M, unsigned long bins, unsigned long H
     this->M = M;
     this->bins = bins;
     this->H = H;
-    
+
     w = getBlackman(M);
 }
 
@@ -103,7 +94,7 @@ double* STFT::getBlackman(unsigned long M) {
 
 double* STFT::zeropad(double* x, unsigned long N, unsigned long newN) {
     double* y = new double[newN];
-    for (unsigned long n=0; n<N; ++n) 
+    for (unsigned long n=0; n<N; ++n)
         y[n] = x[n];
     for(unsigned long n=N; n<newN; n++)
         y[n] = 0;
@@ -116,12 +107,12 @@ double** STFT::stft(double* x) {
 
 double** STFT::stft(double* x, unsigned long N, unsigned long M, unsigned long bins, unsigned long H) {
     // N multiple of M?
-    unsigned long frames = N/H;    
+    unsigned long frames = N/H;
 
     double** X = new double*[frames];
-    
+
     double* x_part = new double[bins*2];
-    
+
     for(unsigned long l=0; l<frames; l++) {
         // copy input buffer:
         for(unsigned long n=0; n<M; n++) {
@@ -133,11 +124,10 @@ double** STFT::stft(double* x, unsigned long N, unsigned long M, unsigned long b
 
     }
     delete[] x_part;
-    
+
     return X;
 }
 
 double STFT::imabs(double re, double im) {
     return std::sqrt((re*re)+(im*im));
 }
-
