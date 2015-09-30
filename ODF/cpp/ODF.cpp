@@ -1,5 +1,6 @@
 #include <cmath>
 #include <iostream>
+#include <cstdlib>
 
 #include "ODF.h"
 
@@ -29,7 +30,7 @@ double** stft_mag(double** X, unsigned long frames, unsigned long bins) {
     for(unsigned long l=0; l<frames; l++) {
         mX[l] = new double[bins];
         for(unsigned long k=0; k<bins; k++)
-            mX[l][k] = imabs(X[l][2*k], X[l][2*k + 1]);
+            mX[l][k] = imabs(X[l][2*k], X[l][2*k + 1]) / bins;
     };
     return mX;
 };
@@ -184,7 +185,7 @@ double* derv(double* x, unsigned long N) {
     double* y = new double[N];
     y[0] = 0;
     for(unsigned long n=1; n<N; ++n)
-        y[n] = x[n] + x[n - 1];
+        y[n] = x[n] - x[n - 1];
     return y;
 };
 
@@ -211,13 +212,12 @@ double* ODF::phaseFlux(double* x, unsigned long N, double th, double inhibTh, un
     
     double** derv = nd_derv(pX_unwrap, FFTSIZE, frames);
     derv = nd_derv(derv, FFTSIZE, frames);
-    
- 
+     
     for(unsigned long l=0; l<frames; ++l) {
         double val = 0;
-        for(unsigned k=0; k<FFTSIZE; ++k) 
+        for(unsigned k=0; k<FFTSIZE; ++k)
             val += derv[k][l] * mX[l][k];
-        if(val/FFTSIZE > th) {
+        if((val/FFTSIZE) > th) {
             onsets[l * HOPSIZE] = val;
             for(unsigned long k=0; k<FFTSIZE; ++k) {
                 if(derv[k][l] > inhibTh) 
@@ -235,15 +235,21 @@ double* ODF::phaseFlux(double* x, unsigned long N, double th, double inhibTh, un
 };
 
 
-int main() {
-    unsigned long N = 1024;
+int main(int argc, char** argv) {
+    double th = atof(argv[1]);
+    int start = atoi(argv[2]);
+
+    unsigned long N = 44100;
     double* x = new double[N*2];
     for(unsigned long n=0; n<N; ++n) {
-        x[2*n] = std::sin(TWOPI * n * 2 / N);
+        double amp = ((int)n > (start)) * ((int)n < start*2);
+        x[2*n] = 0;
+        for(unsigned long m=0; m<10; m++)
+            x[2*n] += std::sin(TWOPI * n * m * 2 / N) * amp;
         x[2*n + 1] = 0;
     };
     ODF odf;
-    double* onsets = odf.phaseFlux(x, N, 10, 0.01, 10);
+    double* onsets = odf.phaseFlux(x, N, th, 0.01, 10);
 
     for(unsigned long n=0; n<N; ++n)
         std::cout << onsets[n] << std::endl;
