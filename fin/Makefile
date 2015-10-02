@@ -4,9 +4,9 @@ LDFLAGS= -L/usr/local/lib -lportaudio
 
 OBJ= main.o ODF.o STFT.o audio_io.o
 
-all: sogmProj3 ODF
+all: sogmProj3
 
-sogmProj3: main.o
+sogmProj3: $(OBJ)
 	$(CC) -o $@ $(CFLAGS) $(OBJ) $(LDFLAGS)
 
 .cpp.o:

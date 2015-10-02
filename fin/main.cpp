@@ -1,8 +1,8 @@
 #include <cmath>
 #include <cstdlib>
 
-#include "ODF/ODF.h"
-#include "portaudio/audio_io.h"
+#include "ODF.h"
+#include "audio_io.h"
 
 #define SAMPLERATE	44100
 #define CHANNELS	1
