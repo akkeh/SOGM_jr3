@@ -130,7 +130,7 @@ float* ODF::phaseFlux(float* x, unsigned long N, float th, float inhibTh, unsign
     for(unsigned long l=0; l<frames; ++l) {
         float val = 0;
         for(unsigned k=0; k<FFTSIZE; ++k)
-            val += derv[k][l] * mX[l][k];
+            val += derv[k][l] * (mX[l][k] > inhibTh);
         if((val/FFTSIZE) > th) {
             onsets[l * HOPSIZE] = val;
             for(unsigned long k=0; k<FFTSIZE; ++k) {

@@ -9,14 +9,15 @@
 #define FRAMES	    65536
 #define ARGCOUNT 3 
 
-int findNotZeros(float* x, unsigned long N, unsigned long offset) {
+int findNotZeros(float* x, unsigned long N, unsigned long offset, float* buffer) {
     int count = 0;
     for(unsigned long n=0; n<N; ++n) {
         if(x[n] > 0) {
-            std::cout << "onset: " << N+(offset*N) << std::endl;
             count++;
         };
     };
+    if(count > 0) 
+        std::cout << "onset!\n";
     return count;
 };
 
@@ -44,14 +45,14 @@ int main(int argc, char** argv) {
 
     // init ODF:
     float th = atof(argv[2]);
-    ODF* odf = new ODF(N, 512, 1024, 128, th, 0.01, 10);
+    ODF* odf = new ODF(N, 512, 1024, 128, th, 0.01, 200);
     float* onsets;
 
     unsigned long frame = 0; 
     while (true) {
         audioStream.read(buffer);
-        onsets = odf->phaseFlux(buffer, N, th, 0.01, 10);
-        findNotZeros(onsets, N, frame);
+        onsets = odf->phaseFlux(buffer, N, th, 0.01, 200);
+        findNotZeros(onsets, N, frame, buffer);
         frame++;
     }
 
