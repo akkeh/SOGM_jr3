@@ -20,6 +20,7 @@ STFT::STFT(unsigned long N, unsigned long M, unsigned long bins, unsigned long H
     this->bins = bins;
     this->H = H;
 
+    //  x_part = new float[2*M];   // allocation improvements?
     w = getBlackman(M);
 }
 
@@ -27,10 +28,10 @@ STFT::~STFT() {
     delete[] w;
 }
 
-int STFT::FFT(double* data, unsigned long nn) {
+int STFT::FFT(float* data, unsigned long nn) {
     unsigned long n, mmax, m, j, istep, i;
-    double wtemp, wr, wpr, wpi, wi, theta;
-    double tempr, tempi;
+    float wtemp, wr, wpr, wpi, wi, theta;
+    float tempr, tempi;
 
     // reverse-binary reindexing
     n = nn << 1;
@@ -78,13 +79,13 @@ int STFT::FFT(double* data, unsigned long nn) {
     return 0;
 }
 
-double* STFT::getBlackman(unsigned long M) {
-    double a0, a1, a2;
+float* STFT::getBlackman(unsigned long M) {
+    float a0, a1, a2;
     a0 = 7938.0/18608.0;
     a1 = 9240.0/18608.0;
     a2 = 1430.0/18608.0;
 
-    double* w = new double[M];
+    float* w = new float[M];
     for(unsigned long n=0; n<M; ++n) {
         w[n] = a0 - a1 * std::cos((TWOPI * (long double)n) / ((long double)M - 1)) + a2 * std::cos((FOURPI * (long double)n) / ((long double)M - 1));
     };
@@ -92,8 +93,8 @@ double* STFT::getBlackman(unsigned long M) {
     return w;
 }
 
-double* STFT::zeropad(double* x, unsigned long N, unsigned long newN) {
-    double* y = new double[newN];
+float* STFT::zeropad(float* x, unsigned long N, unsigned long newN) {
+    float* y = new float[newN];
     for (unsigned long n=0; n<N; ++n)
         y[n] = x[n];
     for(unsigned long n=N; n<newN; n++)
@@ -101,17 +102,17 @@ double* STFT::zeropad(double* x, unsigned long N, unsigned long newN) {
     return y;
 }
 
-double** STFT::stft(double* x) {
+float** STFT::stft(float* x) {
     return stft(x, N, M, bins, H);
 }
 
-double** STFT::stft(double* x, unsigned long N, unsigned long M, unsigned long bins, unsigned long H) {
+float** STFT::stft(float* x, unsigned long N, unsigned long M, unsigned long bins, unsigned long H) {
     // N multiple of M?
     unsigned long frames = N/H;
 
-    double** X = new double*[frames];
+    float** X = new float*[frames];
 
-    double* x_part = new double[bins*2];
+    float* x_part = new float[bins];    // static!
 
     for(unsigned long l=0; l<frames; l++) {
         // copy input buffer:
@@ -128,6 +129,6 @@ double** STFT::stft(double* x, unsigned long N, unsigned long M, unsigned long b
     return X;
 }
 
-double STFT::imabs(double re, double im) {
+float STFT::imabs(float re, float im) {
     return std::sqrt((re*re)+(im*im));
 }

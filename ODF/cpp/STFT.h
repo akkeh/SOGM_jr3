@@ -24,18 +24,18 @@ public:
     STFT(unsigned long N, unsigned long M, unsigned long bins, unsigned long H);
     ~STFT();
 
-    int FFT(double* data, unsigned long nn);
+    int FFT(float* data, unsigned long nn);
 
-    double* getBlackman(unsigned long M);
-    double* zeropad(double* x, unsigned long N, unsigned long newN);
+    float* getBlackman(unsigned long M);
+    float* zeropad(float* x, unsigned long N, unsigned long newN);
 
-    double** stft(double* x);
-    double** stft(double* x, unsigned long N, unsigned long M, unsigned long bins, unsigned long H);
-    double imabs(double re, double im);
+    float** stft(float* x);
+    float** stft(float* x, unsigned long N, unsigned long M, unsigned long bins, unsigned long H);
+    float imabs(float re, float im);
     
 private:
     //window
-    double* w;
+    float* w;
     
     unsigned long N;
     unsigned long M;

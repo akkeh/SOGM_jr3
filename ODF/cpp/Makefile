@@ -1,7 +1,7 @@
 CC = g++
 CFLAGS = -Wall
-OBJ = ODF.o
-PROG = FFTAnalyzer
+OBJ = ODF.o STFT.o
+PROG = onset
 
 all: $(PROG)
 
