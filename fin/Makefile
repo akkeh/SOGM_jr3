@@ -2,7 +2,7 @@ CC = g++
 CFLAGS = -Wall
 LDFLAGS= -L/usr/local/lib -lportaudio
 
-OBJ= main.o ODF.o STFT.o audio_io.o
+OBJ= main.o ODF.o STFT.o audio_io.o wavio.o
 
 all: sogmProj3
 

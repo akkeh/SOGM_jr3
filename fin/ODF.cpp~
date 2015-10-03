@@ -106,10 +106,7 @@ float** nd_derv(float** x, float* mem, unsigned long M, unsigned long N) {
     for(unsigned long m=0; m<M; ++m) {
         y[m] = derv(x[m], mem[m], N);
         mem[m] = y[m][N]; // save memory
-//        for(unsigned long n=0; n<N; ++n)
-            //std::cout << n << "\t" << m << "\t" << y[m][n] << std::endl;
     }
-    
     return y;
 };
 
