@@ -1,6 +1,8 @@
 #include <cmath>
 #include <cstdlib>
+#include <fstream>
 
+#include "STFT.h"
 #include "ODF.h"
 #include "audio_io.h"
 #include "wavio.h"
@@ -30,9 +32,10 @@ int main(int argc, char** argv) {
         return -1;
     }
     
-    unsigned long N = atoi(argv[1]);
+//    unsigned long N = atoi(argv[1]);
+    unsigned long N;
     // open audiostream:
-    float* buffer = new float[N];
+    float* buffer = new float[2048];
     static int input_device;
 
     /*
@@ -55,7 +58,8 @@ int main(int argc, char** argv) {
     float* onsets;
 
     unsigned long frame = 0; 
-    readWav("/media/Data/studie/audioDSP_course/assignments/sms-tools/sounds/bendir.wav", buffer, &N, 0);
+    readWav(argv[1], buffer, &N, 0);
+    std::cout << "read file (" << N << " samples, detecting ODF...\n";
     onsets = odf->phaseFlux(buffer, N, th, binTh, rechargeN);
 /*
     while (true) {
@@ -65,8 +69,15 @@ int main(int argc, char** argv) {
         frame++;
     }
 */
-    for(unsigned long n=0; n<N; n++)
-        std::cout << onsets[n]/FFTSIZE << std::endl;
+    std::ofstream onsetFile;
+    onsetFile.open("onsets.txt");
+    int onsetCount = 0;
+    for(unsigned long n=0; n<N; n++) {
+        onsetFile << onsets[n] << std::endl;
+        if(onsets[n] > 0)
+            onsetCount++;
+    }
+    std::cout << "onsets found: " << onsetCount << std::endl;
 
     delete[] buffer;
 

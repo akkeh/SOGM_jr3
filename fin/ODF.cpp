@@ -1,5 +1,6 @@
 #include <cmath>
 #include <iostream>
+#include <fstream>
 #include <cstdlib>
 
 #include "ODF.h"
@@ -65,7 +66,7 @@ float* phase_unwrap(float* x, unsigned long N) {
 
     y[0] = x[0];
     for(unsigned long n=1; n<N; n++) {
-        if((x[n] < 0) && (x[n - 1]))
+        if((x[n] < 0) && (x[n - 1] > x[n]))
             addPI++;
         y[n] = x[n] + (TWOPI * addPI);
     };
@@ -88,7 +89,6 @@ float** stft_phs(float** X, unsigned long frames, unsigned long bins) {
         for(unsigned long k=0; k<bins; k++)
             pX[l][k] = imphs(X[l][2*k], X[l][2*k + 1]);
     };
-    // transpose pX
     return pX;
 };
 
@@ -113,37 +113,75 @@ float** nd_derv(float** x, float* mem, unsigned long M, unsigned long N) {
     return y;
 };
 
+float* normalise(float* x, unsigned long N) {
+    float max = 0;
+    for(unsigned long n=0; n<N; ++n)
+        if(x[n] > max)
+            max = x[n];
+    
+    float* y = new float[N];
+    max = 1.0 / max;
+    for(unsigned long n=0; n<N; ++n)
+        y[n] = x[n] * max;
+    return y;
+};
+
+float** nd_normalise(float** x, unsigned long M, unsigned long N) {
+    float** y = new float*[M];
+    for(unsigned long m=0; m<M; ++m) {
+        y[m] = normalise(x[m], N);
+    }
+    
+    return y;
+};
+
+
+
 float* ODF::phaseFlux(float* x, unsigned long N, float th, float binTh, unsigned long inhibRel) {
     float* onsets = new float[N];
-
-    // STFT* stft = new STFT(WINDOWSIZE, FFTSIZE, HOPSIZE);
-    // float** X = STFT->stft(x, N, WINDOWSIZE, FFTSIZE, HOPSIZE);
+    for(unsigned long n=0; n<N; ++n)
+        onsets[n] = 0;
     float** X = stft->stft(x, N, WINDOWSIZE, FFTSIZE, HOPSIZE);
 
     unsigned long frames = N/HOPSIZE;
     float** mX = stft_mag(X, frames, FFTSIZE);
     float** pX = stft_phs(X, frames, FFTSIZE);
-
+    /*
+    // normalise?
+    mX = transpose(mX, frames, FFTSIZE);
+    mX = nd_normalise(mX, FFTSIZE, frames);
+    mX = transpose(mX, FFTSIZE, frames);    
+    
+    pXT = nd_normalise(pXT, FFTSIZE, frames);
+    */
     float** pXT = transpose(pX, frames, FFTSIZE);
     float** pX_unwrap = nd_phase_unwrap(pXT, FFTSIZE, frames);
     
     float** derv = nd_derv(pX_unwrap, pX_mem, FFTSIZE, frames);
     derv = nd_derv(derv, derv_mem, FFTSIZE, frames);
-     
+    
+    std::ofstream dervPerFrame;
+    dervPerFrame.open("perFrame.txt");
+
+        float inhibVal = 1;
     for(unsigned long l=0; l<frames; ++l) {
         float val = 0;
-        for(unsigned k=0; k<FFTSIZE; ++k)
-            val += derv[k][l] * (mX[l][k] > binTh);
-        if((val/FFTSIZE) > th) {
+        for(unsigned k=0; k<FFTSIZE; ++k) {
+            val += (derv[k][l]) * (mX[l][k] > binTh);
+        }
+        val = val / FFTSIZE;
+        if(val > (th * inhibVal)) {
             onsets[l * HOPSIZE] = val;
+            /*
             for(unsigned long k=0; k<FFTSIZE; ++k) {
                 if(derv[k][l] > binTh) 
                     for(unsigned long n=0; n<inhibRel; ++n) {
-                        mX[l + n][k] *= n/inhibRel;
+                        mX[l + n][k] *= n/(2*inhibRel);
                         if((l + n) <= frames)
                             break;
                     }
             };
+            */
         }
     }
     
