@@ -9,6 +9,10 @@
 #define FRAMES	    65536
 #define ARGCOUNT 3 
 
+/* sample input:
+$ ./sogmProj3 4096 0.08 0.001 100
+*/
+
 int findNotZeros(float* x, unsigned long N, unsigned long offset, float* buffer) {
     int count = 0;
     for(unsigned long n=0; n<N; ++n) {
@@ -26,6 +30,10 @@ int main(int argc, char** argv) {
         std::cout << "usage: ....\n";
         return -1;
     }
+
+    float* mem = float[256*256];
+    unsigned char wr_ptr1;
+    unsigned char wr_ptr2;
     
     unsigned long N = atoi(argv[1]);
     // open audiostream:

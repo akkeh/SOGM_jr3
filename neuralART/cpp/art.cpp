@@ -9,7 +9,7 @@
 #define FIELD2SIZE 2048
 #define FS 44100.0
 
-double abs(double x) {
+float abs(float x) {
 	return std::sqrt(std::pow(x, 2));
 };
 
@@ -21,12 +21,12 @@ unsigned long ART::get_id_of(unsigned long i) {
 	return field2[i]->get_id();
 };
 
-long ART::eval(double* x, unsigned long id) {
+long ART::eval(float** x, unsigned long id) {
 	if(neuronCount <= 0) {
 		add_Neuron(x, id);
 		return eval(x, id);
 	} else {
-		double* y = new double[neuronCount];
+		float* y = new float[neuronCount];
 		for(unsigned long i=0; i<neuronCount; ++i) {
 			y[i] = field2[i]->eval(x);		// need abs?
 		};
@@ -57,12 +57,12 @@ void save_State() {
 
 };
 
-void ART::add_Neuron(double* x, unsigned long id) {
-	field2[neuronCount] = new Neuron(x, N, c, id);
+void ART::add_Neuron(float** x, unsigned long id) {
+	field2[neuronCount] = new Neuron(x, M, N, c, id);
 	neuronCount++;
 }; 
 
-ART::ART(unsigned long t_N, double t_vigilance) {
+ART::ART(unsigned long t_N, float t_vigilance) {
 	N = t_N;
 	vigilance = t_vigilance;
 
@@ -84,15 +84,16 @@ ART::~ART() {
 int main(int argc, char** argv) {
 	
 	if(argc < 4) {
-		std::cout << "usage: [input vector N][cycles][groups][vigilance]\n";
+		std::cout << "usage: [input vector m][input vector N][cycles][groups][vigilance]\n";
 		return -1;
 	} 
 	unsigned long N = atoi(argv[1]);
-	int cycles = atoi(argv[2]);
-	int groups = atoi(argv[3]);
-	double vigilance = atof(argv[4]) * (double)N;
+	unsigned long M = atoi(argv[2]);
+	int cycles = atoi(argv[3]);
+	int groups = atoi(argv[4]);
+	float vigilance = atof(argv[5]);
 
-	ARTContainer* trainer = new ARTContainer(N, vigilance);
+	ARTContainer* trainer = new ARTContainer(M, N, vigilance);
 	trainer->trainAM(cycles, groups);
 };
 
@@ -100,9 +101,10 @@ int main(int argc, char** argv) {
 
 
 // Container
-ARTContainer::ARTContainer(unsigned long t_N, double vigilance) {
+ARTContainer::ARTContainer(unsigned long t_M, unsigned long t_N, float vigilance) {
+    M = t_M;
 	N = t_N;
-	art = new ART(N, vigilance);
+	art = new ART(M, N, vigilance);
 };
 
 ARTContainer::~ARTContainer() {
@@ -113,9 +115,11 @@ unsigned long ARTContainer::trainAM(unsigned long cycles, unsigned long groups) 
 	// create input arrays:
 	std::cout << "creating input arrays\n";
 	int* group = new int[cycles];
-	double** x = new double*[cycles];
+	float*** x = new float**[cycles];
 	for(unsigned long i=0; i<cycles; i++) {
-		x[i] = new double[N];
+		x[i] = new float*[M];
+        for(unsigned long m=0; m<M; ++m)
+            x[i][m] = new float[N];
 	};
 	
 	// set params of group:
@@ -153,8 +157,8 @@ unsigned long ARTContainer::trainAM(unsigned long cycles, unsigned long groups) 
 	std::cout << "creating cycles\n";
 	for(unsigned long i=0; i<cycles; i++) {
 		group[i] = rand() % groups;
-		double f1 = group_Params[group[i]][0] + (rand() % 20 - 10);
-		double f2 = group_Params[group[i]][1] + (rand() % 20 - 10);
+		float f1 = group_Params[group[i]][0] + (rand() % 20 - 10);
+		float f2 = group_Params[group[i]][1] + (rand() % 20 - 10);
 		for(unsigned long n=0; n<N; n++) {
 			x[i][n] = std::sin((M_PI+M_PI) * n * f1 / FS) * std::sin((M_PI+M_PI) * n * f2 / FS);
 		};
@@ -187,7 +191,7 @@ unsigned long ARTContainer::trainAM(unsigned long cycles, unsigned long groups) 
 				members++;
 		std::cout << " group[" << i << "]: f1 = " << group_Params[i][0] << "\tf2 = " << group_Params[i][1] << "\t members: " << members << "\tfalse negatives: " << group_false_neg[i] << "\tfalse positives: " << group_false_pos[i] << std::endl;
 	};
-	std::cout << "total false negatives: " << false_neg << " ratio: " << (double)false_neg / (double)cycles << std::endl;
-	std::cout << "total false positives: " << false_pos << " ratio: " << (double)false_pos / (double)cycles << std::endl;
-	std::cout << "total misses: " << false_pos + false_neg << " ratio: " << (double)(false_pos+false_neg) / (double)cycles << std::endl;
+	std::cout << "total false negatives: " << false_neg << " ratio: " << (float)false_neg / (float)cycles << std::endl;
+	std::cout << "total false positives: " << false_pos << " ratio: " << (float)false_pos / (float)cycles << std::endl;
+	std::cout << "total misses: " << false_pos + false_neg << " ratio: " << (float)(false_pos+false_neg) / (float)cycles << std::endl;
 };

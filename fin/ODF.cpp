@@ -115,7 +115,12 @@ float* ODF::phaseFlux(float* x, unsigned long N, float th, float inhibTh, unsign
 
     // STFT* stft = new STFT(WINDOWSIZE, FFTSIZE, HOPSIZE);
     // float** X = STFT->stft(x, N, WINDOWSIZE, FFTSIZE, HOPSIZE);
-    float** X = stft->stft(x, N, WINDOWSIZE, FFTSIZE, HOPSIZE);
+    float* x_compl = new float[N*2];
+    for(unsigned long n=0; n<N; ++n) {
+        x_compl[2*n] = x[n];
+        x_compl[2*n+1] = 0;
+    }
+    float** X = stft->stft(x_compl, N, WINDOWSIZE, FFTSIZE, HOPSIZE);
 
     unsigned long frames = N/HOPSIZE;
     float** mX = stft_mag(X, frames, FFTSIZE);
@@ -131,7 +136,8 @@ float* ODF::phaseFlux(float* x, unsigned long N, float th, float inhibTh, unsign
         float val = 0;
         for(unsigned k=0; k<FFTSIZE; ++k)
             val += derv[k][l] * (mX[l][k] > inhibTh);
-        if((val/FFTSIZE) > th) {
+        val = val / FFTSIZE;
+        if(val > th) {
             onsets[l * HOPSIZE] = val;
             for(unsigned long k=0; k<FFTSIZE; ++k) {
                 if(derv[k][l] > inhibTh) 
