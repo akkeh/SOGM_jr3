@@ -33,6 +33,8 @@ ODF::ODF(unsigned long N, unsigned long M, unsigned long bins, unsigned long H, 
 
 
 float imabs(float re, float im) {
+    if(re == 0 && im == 0)
+        return 0;
     return std::sqrt((re*re)+(im*im));
 };
 
@@ -47,6 +49,8 @@ float** stft_mag(float** X, unsigned long frames, unsigned long bins) {
 };
 
 float imphs(float re, float im) {
+    if(re == 0 && im == 0)
+        return 0;
     return std::atan2(im, re);
 };
 
@@ -159,20 +163,22 @@ float* ODF::phaseFlux(float* x, unsigned long N, float th, float binTh, unsigned
     
     float** derv = nd_derv(pX_unwrap, pX_mem, FFTSIZE, frames);
     derv = nd_derv(derv, derv_mem, FFTSIZE, frames);
+
     
     std::ofstream dervPerFrame;
     dervPerFrame.open("perFrame.txt");
 
-        float inhibVal = 1;
+    std::cout << "mark!\n";
+
     for(unsigned long l=0; l<frames; ++l) {
         float val = 0;
+        float ampl = 0;
         for(unsigned k=0; k<FFTSIZE; ++k) {
-            val += (derv[k][l]) * (mX[l][k] > binTh);
+            val += derv[k][l] * (mX[l][k] > binTh);
         }
         val = val / FFTSIZE;
-        if(val > (th * inhibVal)) {
+        if(val > th) {
             onsets[l * HOPSIZE] = val;
-            /*
             for(unsigned long k=0; k<FFTSIZE; ++k) {
                 if(derv[k][l] > binTh) 
                     for(unsigned long n=0; n<inhibRel; ++n) {
@@ -181,7 +187,6 @@ float* ODF::phaseFlux(float* x, unsigned long N, float th, float binTh, unsigned
                             break;
                     }
             };
-            */
         }
     }
     

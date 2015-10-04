@@ -1,7 +1,7 @@
 #ifndef WAVIO_H_
 #define WAVIO_H_
 
-int readWav(const char* filename, float* x, unsigned long* N, int print);
+float* readWav(const char* filename, unsigned long* N, int print);
 
 
 #endif

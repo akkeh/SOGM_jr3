@@ -17,11 +17,12 @@
 ||
 */
 
-int readWav(const char* filename, float* x, unsigned long* N, int print) {
+float* readWav(const char* filename, unsigned long* N, int print) {
     int error = -1;
     FILE* infile=fopen(filename, "rb");
     std::ofstream waveform;
     waveform.open("waveform.txt");
+    float* x;
     if(!infile) { printf("file %s not found", filename); goto exit; }
 
     //RIFF
@@ -112,7 +113,7 @@ int readWav(const char* filename, float* x, unsigned long* N, int print) {
         fread(&in_data[n], sizeof(short), 1, infile);
         x[n] = float(in_data[n])/bit_depth;
         waveform << x[n]/100 << std::endl;
-//	printf("sample: %i\t= %f\n", n, x[n]);
+	//printf("sample: %i\t= %f\n", n, x[n]);
     }
 
     error = 0;
@@ -123,8 +124,8 @@ int readWav(const char* filename, float* x, unsigned long* N, int print) {
         *N = size;
         chn_num = chn_num;
         fs = fs;
-        return 0;
+        return x;
     }
-    return -1;
+    return x;
 }
 

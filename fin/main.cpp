@@ -35,7 +35,7 @@ int main(int argc, char** argv) {
 //    unsigned long N = atoi(argv[1]);
     unsigned long N;
     // open audiostream:
-    float* buffer = new float[2048];
+//    float* buffer;// = new float[100];
     static int input_device;
 
     /*
@@ -54,12 +54,18 @@ int main(int argc, char** argv) {
     float th = atof(argv[2]);
     float binTh = atof(argv[3]);
     int rechargeN = atoi(argv[4]);
-    ODF* odf = new ODF(N, 512, 1024, 128, th, binTh, rechargeN);
     float* onsets;
 
     unsigned long frame = 0; 
-    readWav(argv[1], buffer, &N, 0);
-    std::cout << "read file (" << N << " samples, detecting ODF...\n";
+    float* x =  readWav(argv[1], &N, 1);
+    
+    std::cout << "read file (" << N << " samples), detecting ODF...\n";
+    float* buffer = new float[N*2];
+    for(unsigned long n=0; n<N; ++n) {
+        buffer[2*n] = x[n];  // real
+        buffer[2*n + 1] = 0;      // imag.
+    };
+    ODF* odf = new ODF(N, 512, 1024, 128, th, binTh, rechargeN);
     onsets = odf->phaseFlux(buffer, N, th, binTh, rechargeN);
 /*
     while (true) {
