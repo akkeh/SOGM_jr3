@@ -23,7 +23,9 @@ unsigned long ART::get_id_of(unsigned long i) {
 
 long ART::eval(float** x, unsigned long id) {
 	if(neuronCount <= 0) {
+        std::cout << "adding neuron\n";
 		add_Neuron(x, id);
+        std::cout << "eval\n";
 		return eval(x, id);
 	} else {
 		float* y = new float[neuronCount];
@@ -62,7 +64,8 @@ void ART::add_Neuron(float** x, unsigned long id) {
 	neuronCount++;
 }; 
 
-ART::ART(unsigned long t_N, float t_vigilance) {
+ART::ART(unsigned long t_M, unsigned long t_N, float t_vigilance) {
+    M = t_M;
 	N = t_N;
 	vigilance = t_vigilance;
 
@@ -81,21 +84,4 @@ ART::~ART() {
 		$ ./ART 2048 10000 10 0.016
 
 */
-int main(int argc, char** argv) {
-	
-	if(argc < 4) {
-		std::cout << "usage: [input vector m][input vector N][cycles][groups][vigilance]\n";
-		return -1;
-	} 
-	unsigned long N = atoi(argv[1]);
-	unsigned long M = atoi(argv[2]);
-    
-	int cycles = atoi(argv[3]);
-	int groups = atoi(argv[4]);
-	float vigilance = atof(argv[5]);
-
-	ARTContainer* trainer = new ARTContainer(M, N, vigilance);
-	trainer->trainAM(cycles, groups);
-};
-
 

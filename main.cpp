@@ -44,13 +44,15 @@ int main(int argc, char** argv) {
 
     // init ODF:
     float th = atof(argv[2]);
-    ODF* odf = new ODF(N, 512, 1024, 128, th, 0.01, 10);
+    float binTh = atof(argv[3]);
+    int rechargeN = atoi(argv[4]);
+    ODF* odf = new ODF(N, 512, 1024, 128, th, binTh, rechargeN);
     float* onsets;
 
     unsigned long frame = 0; 
     while (true) {
         audioStream.read(buffer);
-        onsets = odf->phaseFlux(buffer, N, th, 0.01, 10);
+        onsets = odf->phaseFlux(buffer, N);
         findNotZeros(onsets, N, frame);
         frame++;
     }

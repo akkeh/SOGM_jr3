@@ -39,6 +39,7 @@ Neuron::Neuron(float** x, unsigned long t_M, unsigned long t_N, float t_c, unsig
 	M = t_M;
     N = t_N;
 	w = new float*[M];
+    std::cout << "neuron added\n";
     for(unsigned long m=0; m<M; ++m) {
         w[m] = new float[N];
     	for(unsigned long n=0; n<N; ++n)

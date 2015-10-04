@@ -17,14 +17,14 @@
 */
 class ODF {
 public:
-    ODF(unsigned long N, unsigned long M, unsigned long bins, unsigned long H, float th, float inhibTh, unsigned long inhibRel);
-    float* phaseFlux(float* x, unsigned long N, float th, float inhibTh, unsigned long inhibRel);
+    ODF(unsigned long N, unsigned long M, unsigned long bins, unsigned long H, float th, float binTh, unsigned long inhibRel);
+    float* phaseFlux(float* x, unsigned long N, float th, float binTh, unsigned long inhibRel);
 private:
     unsigned long N;    // input buffer lenght
     STFT* stft;
     
     float th;
-    float inhibTh;
+    float binTh;
     float inhibRel;
     float* pX_mem;
     float* derv_mem;    

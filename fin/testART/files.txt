@@ -1,0 +1,2 @@
+sounds/bendir_kort.wav
+sounds/sine_440.wav
