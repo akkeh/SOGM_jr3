@@ -20,6 +20,7 @@ ODF::ODF(unsigned long N, unsigned long M, unsigned long bins, unsigned long H, 
     stft = new STFT(N, M, bins, H);
 
     th = tth;
+    thMul = 1;
     inhibTh = tinhibTh;
     inhibRel = tinhibRel;
     pX_mem = new float[M];
@@ -110,7 +111,7 @@ float** nd_derv(float** x, float* mem, unsigned long M, unsigned long N) {
     return y;
 };
 
-float* ODF::phaseFlux(float* x, unsigned long N, float th, float inhibTh, unsigned long inhibRel) {
+float* ODF::phaseFlux(float* x, unsigned long N, float th, unsigned long rechargeN, float inhibTh, unsigned long inhibRel) {
     float* onsets = new float[N];
 
     // STFT* stft = new STFT(WINDOWSIZE, FFTSIZE, HOPSIZE);
@@ -131,13 +132,14 @@ float* ODF::phaseFlux(float* x, unsigned long N, float th, float inhibTh, unsign
     
     float** derv = nd_derv(pX_unwrap, pX_mem, FFTSIZE, frames);
     derv = nd_derv(derv, derv_mem, FFTSIZE, frames);
-     
+    unsigned long onset_l = -rechargeN;
     for(unsigned long l=0; l<frames; ++l) {
         float val = 0;
         for(unsigned k=0; k<FFTSIZE; ++k)
             val += derv[k][l] * (mX[l][k] > inhibTh);
         val = val / FFTSIZE;
-        if(val > th) {
+        if(val > (th * thMul)) {
+            onset_l = l;
             onsets[l * HOPSIZE] = val;
             for(unsigned long k=0; k<FFTSIZE; ++k) {
                 if(derv[k][l] > inhibTh) 
@@ -148,6 +150,10 @@ float* ODF::phaseFlux(float* x, unsigned long N, float th, float inhibTh, unsign
                     }
             };
         }
+        if(thMul < 1)
+            thMul = (l - onset_l) / rechargeN;
+        if(thMul > 1)
+            thMul = 1;
     }
     
     

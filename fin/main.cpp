@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    float* mem = float[256*256];
+    float* mem = new float[256*256];
     unsigned char wr_ptr1;
     unsigned char wr_ptr2;
     
@@ -53,13 +53,16 @@ int main(int argc, char** argv) {
 
     // init ODF:
     float th = atof(argv[2]);
+    int rechargeN = atoi(argv[3]);
+    float binTh = atof(argv[4]);
+    int binN = atoi(argv[5]);
     ODF* odf = new ODF(N, 512, 1024, 128, th, 0.01, 200);
     float* onsets;
 
     unsigned long frame = 0; 
     while (true) {
         audioStream.read(buffer);
-        onsets = odf->phaseFlux(buffer, N, th, 0.01, 200);
+        onsets = odf->phaseFlux(buffer, N, th, rechargeN, binTh, binN);
         findNotZeros(onsets, N, frame, buffer);
         frame++;
     }

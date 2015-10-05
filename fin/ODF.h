@@ -18,7 +18,7 @@
 class ODF {
 public:
     ODF(unsigned long N, unsigned long M, unsigned long bins, unsigned long H, float th, float inhibTh, unsigned long inhibRel);
-    float* phaseFlux(float* x, unsigned long N, float th, float inhibTh, unsigned long inhibRel);
+    float* phaseFlux(float* x, unsigned long N, float th, unsigned long rechargeN, float inhibTh, unsigned long inhibRel);
 private:
     unsigned long N;    // input buffer lenght
     STFT* stft;
@@ -26,6 +26,7 @@ private:
     float th;
     float inhibTh;
     float inhibRel;
+    float thMul;
     float* pX_mem;
     float* derv_mem;    
     
