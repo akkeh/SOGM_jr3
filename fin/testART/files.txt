@@ -1,2 +1,16 @@
 sounds/bendir_kort.wav
+k
+sounds/clicks.wav
+i
+sounds/piano2.wav
+a
+sounds/piano_kort2.wav
+o
+sounds/piano_kort.wav
+k
+sounds/rissetdrum.wav
+d
+sounds/silence.wav
+e
 sounds/sine_440.wav
+_

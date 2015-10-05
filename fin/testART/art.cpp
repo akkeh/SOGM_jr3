@@ -23,9 +23,7 @@ unsigned long ART::get_id_of(unsigned long i) {
 
 long ART::eval(float** x, unsigned long id) {
 	if(neuronCount <= 0) {
-        std::cout << "adding neuron\n";
 		add_Neuron(x, id);
-        std::cout << "eval\n";
 		return eval(x, id);
 	} else {
 		float* y = new float[neuronCount];

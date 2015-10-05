@@ -1,0 +1,12 @@
+#! /bin/bash
+
+
+iterations=$1
+V1=$2
+V2=$2
+
+for i in `seq 1 $iterations`
+do
+    vigl=`echo "scale=10; ($V2-$V1) / $iterations * $i" | bc`
+    ./sogmProj3 vigl
+done

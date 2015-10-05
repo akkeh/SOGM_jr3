@@ -23,11 +23,13 @@ ODF::ODF(unsigned long N, unsigned long M, unsigned long bins, unsigned long H, 
     th = tth;
     binTh = tbinTh;
     inhibRel = tinhibRel;
-    pX_mem = new float[M];
-    derv_mem = new float[M];
-    for(unsigned long m=0; m<M; m++) {
+    pX_mem = new float[bins];
+    derv_mem = new float[bins];
+    mX_mem = new float[bins];
+    for(unsigned long m=0; m<bins; m++) {
         pX_mem[m] = 0;
         derv_mem[m] = 0;
+        mX_mem[m] = 0;
     };
 };
 
@@ -109,7 +111,7 @@ float** nd_derv(float** x, float* mem, unsigned long M, unsigned long N) {
     float** y = new float*[M];
     for(unsigned long m=0; m<M; ++m) {
         y[m] = derv(x[m], mem[m], N);
-        mem[m] = y[m][N]; // save memory
+        mem[m] = y[m][N-1]; // save memory
 //        for(unsigned long n=0; n<N; ++n)
             //std::cout << n << "\t" << m << "\t" << y[m][n] << std::endl;
     }
@@ -120,11 +122,11 @@ float** nd_derv(float** x, float* mem, unsigned long M, unsigned long N) {
 float* normalise(float* x, unsigned long N) {
     float max = 0;
     for(unsigned long n=0; n<N; ++n)
-        if(x[n] > max)
-            max = x[n];
+        if((x[n]*x[n]) > max)
+            max = x[n]*x[n];
     
     float* y = new float[N];
-    max = 1.0 / max;
+    max = 1.0 / std::sqrt(max);
     for(unsigned long n=0; n<N; ++n)
         y[n] = x[n] * max;
     return y;
@@ -142,30 +144,29 @@ float** nd_normalise(float** x, unsigned long M, unsigned long N) {
 
 
 float* ODF::phaseFlux(float* x, unsigned long N, float th, float binTh, unsigned long inhibRel) {
-     // STFT* stft = new STFT(WINDOWSIZE, FFTSIZE, HOPSIZE);
-    // float** X = STFT->stft(x, N, WINDOWSIZE, FFTSIZE, HOPSIZE);
-    float* x_compl = new float[N*2];
-    for(unsigned long n=0; n<N; ++n) {
-        x_compl[2*n] = x[n];
-        x_compl[2*n+1] = 0;
-    }
-    float** X = stft->stft(x_compl, N, WINDOWSIZE, FFTSIZE, HOPSIZE);
-   float* onsets = new float[N];
+    float* onsets = new float[N];
     for(unsigned long n=0; n<N; ++n)
         onsets[n] = 0;
+
+    float* x_c = new float[2*N];
+    for(unsigned long n=0; n<N; ++n) {
+        x_c[2*n] = x[n];
+        x_c[2*n+1] = 0;
+    };
+    
+    float** X = stft->stft(x_c, N, WINDOWSIZE, FFTSIZE, HOPSIZE);
 
     unsigned long frames = N/HOPSIZE;
     float** mX = stft_mag(X, frames, FFTSIZE);
     float** pX = stft_phs(X, frames, FFTSIZE);
-    /*
     // normalise?
     mX = transpose(mX, frames, FFTSIZE);
     mX = nd_normalise(mX, FFTSIZE, frames);
     mX = transpose(mX, FFTSIZE, frames);    
     
-    pXT = nd_normalise(pXT, FFTSIZE, frames);
-    */
     float** pXT = transpose(pX, frames, FFTSIZE);
+    
+    pXT = nd_normalise(pXT, FFTSIZE, frames);
     float** pX_unwrap = nd_phase_unwrap(pXT, FFTSIZE, frames);
     
     float** derv = nd_derv(pX_unwrap, pX_mem, FFTSIZE, frames);
@@ -181,7 +182,8 @@ float* ODF::phaseFlux(float* x, unsigned long N, float th, float binTh, unsigned
         float val = 0;
         float ampl = 0;
         for(unsigned k=0; k<FFTSIZE; ++k) {
-            val += derv[k][l] * (mX[l][k] > binTh);
+            val += derv[k][l] * (mX[l][k] < binTh);
+            mX_mem[k] = mX[l][k];
         }
         val = val / FFTSIZE;
         if(val > th) {
